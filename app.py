@@ -203,7 +203,7 @@ try:
                         country_col: "Country",
                         "Indicator Value": "Indicator Value"
                     },
-                    barmode_group_gap=0.15
+                    
                 )
 
                 st.plotly_chart(
