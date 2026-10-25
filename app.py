@@ -104,6 +104,71 @@ try:
     )
 
 except Exception as e:
+        st.subheader("📊 Debt Indicators: 2020 vs 2024")
+
+    if "2020" in df.columns and "2024" in df.columns:
+        year_data = df.copy()
+
+        year_data["2020"] = pd.to_numeric(
+            year_data["2020"], errors="coerce"
+        )
+        year_data["2024"] = pd.to_numeric(
+            year_data["2024"], errors="coerce"
+        )
+
+        indicator_col = next(
+            (c for c in ["Series Name", "series_name"] if c in df.columns),
+            None
+        )
+
+        country_col = next(
+            (c for c in ["Country Name", "country_name"] if c in df.columns),
+            None
+        )
+
+        if country_col and indicator_col:
+            country_options = sorted(
+                year_data[country_col].dropna().unique()
+            )
+            selected = st.selectbox(
+                "Choose country for comparison",
+                country_options,
+                key="comparison_country"
+            )
+
+            comparison = year_data[
+                year_data[country_col] == selected
+            ][[indicator_col, "2020", "2024"]].copy()
+
+            comparison = comparison.dropna(
+                subset=["2020", "2024"]
+            ).head(20)
+
+            if not comparison.empty:
+                chart_data = comparison.melt(
+                    id_vars=indicator_col,
+                    value_vars=["2020", "2024"],
+                    var_name="Year",
+                    value_name="Indicator Value"
+                )
+
+                fig = px.bar(
+                    chart_data,
+                    x=indicator_col,
+                    y="Indicator Value",
+                    color="Year",
+                    barmode="group",
+                    title=f"{selected}: 2020 vs 2024"
+                )
+
+                st.plotly_chart(fig, use_container_width=True)
+                st.dataframe(comparison, use_container_width=True)
+            else:
+                st.warning(
+                    "No comparable 2020 and 2024 values for this country."
+                )
+    else:
+        st.warning("The dataset does not contain both 2020 and 2024 columns.")
     st.error(f"Unable to load dataset: {e}")
     st.info("Check that International_Debt_Cleaned.csv exists in the repository.")
 
