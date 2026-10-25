@@ -143,8 +143,12 @@ try:
             [country_col, indicator_col, "2020", "2024"]
         ].copy()
 
-        comparison = comparison.dropna(subset=["2020", "2024"])
+comparison = comparison.dropna(subset=["2020", "2024"])
 
+comparison = comparison[
+    (comparison["2020"] != 0) |
+    (comparison["2024"] != 0)
+]
         if not comparison.empty:
 
             st.caption(
